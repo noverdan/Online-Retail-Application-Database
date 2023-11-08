@@ -1,11 +1,11 @@
 -- tabel alamat
 CREATE TABLE alamat(
     id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    desa VARCHAR(50) NOT NULL,
-    kecamatan VARCHAR(50) NOT NULL,
-    kabupaten VARCHAR(50) NOT NULL,
-    provinsi VARCHAR(50) NOT NULL,
-    kode_pos INT(5) NOT NULL
+    desa VARCHAR(50),
+    kecamatan VARCHAR(50),
+    kabupaten VARCHAR(50),
+    provinsi VARCHAR(50),
+    kode_pos INT(5)
 );
 
 -- tabel pelanggan
