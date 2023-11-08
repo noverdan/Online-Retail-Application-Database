@@ -13,7 +13,7 @@ CREATE TABLE pelanggan(
     id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     nama VARCHAR(255) NOT NULL,
     email VARCHAR(50) NOT NULL,
-    hp INT(13) NOT NULL,
+    hp BIGINT(15) NOT NULL,
     id_alamat INT,
     FOREIGN KEY (id_alamat) REFERENCES alamat(id)
 );
