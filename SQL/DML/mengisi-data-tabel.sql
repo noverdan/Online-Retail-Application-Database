@@ -1,63 +1,4 @@
-CREATE DATABASE online_retail;
-
--- Start Membuat Tabel
-CREATE TABLE alamat(
-id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-desa VARCHAR(50),
-kecamatan VARCHAR(50),
-kabupaten VARCHAR(50),
-provinsi VARCHAR(50),
-kode_pos INT(5)
-);
-
-CREATE TABLE pelanggan(
-id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-nama VARCHAR(255) NOT NULL,
-email VARCHAR(50) NOT NULL,
-hp BIGINT(15) NOT NULL,
-id_alamat INT,
-FOREIGN KEY (id_alamat) REFERENCES alamat(id)
-);
-
-CREATE TABLE pembayaran(
-id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-provider VARCHAR(50) NOT NULL
-);
-
-CREATE TABLE pesanan(
-id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-id_pelanggan INT,
-id_pembayaran INT,
-tanggal_pesan DATE NOT NULL,
-FOREIGN KEY (id_pelanggan) REFERENCES pelanggan(id),
-FOREIGN KEY (id_pembayaran) REFERENCES pembayaran(id)
-);
-
-CREATE TABLE kategori(
-id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-nama VARCHAR(50) NOT NULL
-);
-
-CREATE TABLE produk(
-id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-nama VARCHAR(255) NOT NULL,
-harga INT NOT NULL,
-id_kategori INT,
-FOREIGN KEY (id_kategori) REFERENCES kategori(id)
-);
-
-CREATE TABLE item_pesanan(
-id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-id_pesanan INT,
-id_produk INT,
-kuantitas INT NOT NULL,
-FOREIGN KEY (id_pesanan) REFERENCES pesanan(id),
-FOREIGN KEY (id_produk) REFERENCES produk(id)
-);
--- End Membuat Tabel
-
-
--- Start Menambahkan Values ke Tabel
+-- Menambahkan data alamat
 INSERT INTO alamat (desa, kecamatan, kabupaten, provinsi, kode_pos) VALUES
 ('Desa Mulyorejo', 'Kecamatan Jati', 'Kabupaten Merdeka', 'Jawa Tengah', '40121'),
 ('Desa Cikarang', 'Kecamatan Citra', 'Kabupaten Mandiri', 'Jawa Tengah', '50132'),
@@ -70,6 +11,7 @@ INSERT INTO alamat (desa, kecamatan, kabupaten, provinsi, kode_pos) VALUES
 ('Desa Bumi Ayu', 'Kecamatan Bumi', 'Kabupaten Asri', 'Jawa Tengah', '75123'),
 ('Desa Alam Sari', 'Kecamatan Alam', 'Kabupaten Sari', 'Jawa Tengah', '90123');
 
+-- Menambahkan data pelanggan
 INSERT INTO pelanggan (nama, email, hp, id_alamat) VALUES
 ('John Doe', 'johndoe@example.com', 62123456789, 1),
 ('Jane Smith', 'janesmith@example.com', 62234567890, 2),
@@ -82,6 +24,7 @@ INSERT INTO pelanggan (nama, email, hp, id_alamat) VALUES
 ('Daniel Clark', 'danielclark@example.com', 62901234567, 9),
 ('Jessica Hall', 'jessicahall@example.com', 62012345678, 10);
 
+-- Menambahkan data kategori
 INSERT INTO kategori (nama) VALUES
 ('Pakaian Wanita'),
 ('Pakaian Pria'),
@@ -94,6 +37,7 @@ INSERT INTO kategori (nama) VALUES
 ('Otomotif'),
 ('Perlengkapan Rumah Tangga');
 
+-- Menambahkan data produk
 INSERT INTO produk (nama, harga, id_kategori) VALUES
 ('Baju Batik', 150000, 1),
 ('Gaun Pesta', 300000, 1),
@@ -124,8 +68,10 @@ INSERT INTO produk (nama, harga, id_kategori) VALUES
 ('Parfum Floral', 180000, 7),
 ('Mainan Mobil Remote', 120000, 8),
 ('Ban Mobil', 300000, 9),
-('Kompor Gas', 350000, 10);
+('Kompor Gas', 350000, 10),
+('Piring', 35000, 10);
 
+-- menambahkan data pembayaran
 INSERT INTO pembayaran(provider) VALUES
 ('BRI VA/Transfer'),
 ('BCA VA/Transfer'),
@@ -138,6 +84,7 @@ INSERT INTO pembayaran(provider) VALUES
 ('Qris'),
 ('Bayar Ditempat');
 
+-- menambahkan data pesanan
 INSERT INTO pesanan(id_pelanggan, id_pembayaran, tanggal_pesan) VALUES
 (1, 5, '2023-09-10'),
 (1, 1, '2023-09-12'),
@@ -156,6 +103,7 @@ INSERT INTO pesanan(id_pelanggan, id_pembayaran, tanggal_pesan) VALUES
 (8, 6, '2023-10-15'),
 (5, 2, '2023-10-17');
 
+-- menambahkan data item_pesanan
 INSERT INTO item_pesanan(id_pesanan, id_produk, kuantitas) VALUES
 (1, 17, 1),
 (1, 23, 1),
@@ -189,91 +137,3 @@ INSERT INTO item_pesanan(id_pesanan, id_produk, kuantitas) VALUES
 (16, 26, 1),
 (16, 5, 2),
 (16, 4, 1);
--- End Menambahkan Values ke Tabel
-
--- start Mengubah nama kolom yang ambigu
-ALTER TABLE kategori
-CHANGE nama nama_kategori VARCHAR(50);
-
-ALTER TABLE produk
-CHANGE nama nama_produk VARCHAR(255);
--- End mengubah nama kolom
-
-
--- Start Retrive data from tabel
-SELECT * FROM pelanggan;
-
-SELECT * FROM alamat;
-
-SELECT * FROM produk;
-
-SELECT * FROM kategori;
-
-SELECT * FROM pesanan;
-
-SELECT * FROM item_pesanan;
-
-SELECT * FROM pembayaran;
-
-SELECT pelanggan.id, pelanggan.nama, pelanggan.email, pelanggan.hp,
-       CONCAT(alamat.desa, ', ', alamat.kecamatan, ', ', alamat.kabupaten, ', ', alamat.provinsi, ', ', alamat.kode_pos) AS alamat_lengkap
-FROM pelanggan 
-JOIN alamat ON pelanggan.id_alamat = alamat.id;
-
-SELECT produk.id, produk.nama_produk, 
-       CONCAT('Rp', FORMAT(produk.harga, 0)) AS harga, 
-       kategori.nama_kategori AS kategori 
-FROM produk 
-JOIN kategori ON produk.id_kategori = kategori.id;
-
-SELECT pesanan.id, 
-       pelanggan.nama AS pelanggan, 
-       GROUP_CONCAT(CONCAT(produk.nama_produk, '[',CONCAT('Rp', FORMAT(produk.harga, 0)),'*',item_pesanan.kuantitas,']')) AS produk,
-       SUM(item_pesanan.kuantitas) AS total_produk,
-       CONCAT('Rp', FORMAT(SUM(produk.harga * item_pesanan.kuantitas) , 0)) AS total_harga,
-       pembayaran.provider AS pembayaran, 
-       pesanan.tanggal_pesan
-FROM pesanan
-JOIN item_pesanan ON pesanan.id = item_pesanan.id_pesanan
-JOIN pelanggan ON pesanan.id_pelanggan = pelanggan.id
-JOIN pembayaran ON pesanan.id_pembayaran = pembayaran.id
-JOIN produk ON item_pesanan.id_produk = produk.id
-GROUP BY pesanan.id;
--- End Retrive data from tabel
-
--- Start Mengubah values data Tabel
-UPDATE pelanggan
-SET nama = 'Galang Arsandy', email = 'glangarsandy@gmail.com', hp = 6285157994646
-WHERE id = 1;
-
-UPDATE alamat
-SET desa = 'Desa Perubahan', kecamatan = 'Kecamatan Baru-Baru'
-WHERE id = 1;
-
-UPDATE produk
-SET harga = 7000000
-WHERE id = 11;
--- End Mengubah values data Tabel
-
--- Start Menghapus data values Tabel
-DELETE FROM pelanggan WHERE id = 1;
-DELETE FROM alamat WHERE id = 1;
-
-DELETE FROM produk WHERE id = 10;
-
-DELETE FROM pesanan;
-DELETE FROM item_pesanan;
--- End Menghapus data values Tabel
-
--- Start menghapus tabel
-DROP TABLE alamat;
-DROP TABLE pelanggan;
-DROP TABLE kategori;
-DROP TABLE produk;
-DROP TABLE item_pesanan;
-DROP TABLE pembayaran;
-DROP TABLE pesanan;
--- End menghapus tabel
-
--- Delete database
-DROP DATABASE online_retail;
